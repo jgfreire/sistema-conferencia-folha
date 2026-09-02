@@ -1,0 +1,19 @@
+{
+  "name": "conferencia-folha-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Backend de autenticação, controle de acesso administrativo e proxy da API da Anthropic para o sistema Conferência de Folha.",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "hash-password": "node scripts/hash-password.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-session": "^1.18.1"
+  }
+}

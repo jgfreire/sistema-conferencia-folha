@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Conferência de Folha</title>
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="title-block">
+      <h1>CONFERÊNCIA DE FOLHA</h1>
+      <p>Comparação de folhas entre duas competências — EMPREGADOS e CONTRIBUINTES, sem pró-labore variável</p>
+    </div>
+    <div class="actions">
+      <span class="session-user" id="session-user"></span>
+      <button class="btn" id="logout-btn">Sair</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="upload-screen">
+      <div class="upload-grid">
+        <div class="upload-slot" id="slot-anterior" data-slot="anterior">
+          <h3>Folha do mês anterior</h3>
+          <label class="dropzone" for="input-anterior">
+            <span>Arraste o arquivo aqui ou clique para selecionar</span>
+            <span class="dropzone-hint">PDF, XLS, XLSX, CSV, TXT, JPG, JPEG ou PNG</span>
+          </label>
+          <input type="file" id="input-anterior" accept=".pdf,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png" hidden>
+          <p class="slot-status">Nenhum arquivo selecionado</p>
+          <div class="slot-result"></div>
+        </div>
+
+        <div class="upload-slot" id="slot-atual" data-slot="atual">
+          <h3>Folha do mês atual</h3>
+          <label class="dropzone" for="input-atual">
+            <span>Arraste o arquivo aqui ou clique para selecionar</span>
+            <span class="dropzone-hint">PDF, XLS, XLSX, CSV, TXT, JPG, JPEG ou PNG</span>
+          </label>
+          <input type="file" id="input-atual" accept=".pdf,.xls,.xlsx,.csv,.txt,.jpg,.jpeg,.png" hidden>
+          <p class="slot-status">Nenhum arquivo selecionado</p>
+          <div class="slot-result"></div>
+        </div>
+      </div>
+
+      <div id="blocking-errors"></div>
+
+      <div class="actions-row">
+        <button class="btn btn-primary" id="btn-conferir" disabled>REALIZAR CONFERÊNCIA</button>
+      </div>
+    </section>
+
+    <section id="result-screen" class="hidden">
+      <div id="result-content"></div>
+      <div id="pdf-download-area"></div>
+      <div class="actions-row">
+        <button class="btn btn-primary" id="btn-baixar-pdf">BAIXAR RELATÓRIO PDF</button>
+        <button class="btn" id="btn-nova-conferencia">Nova conferência</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Bibliotecas (leitura local de PDF/planilha e geração do PDF final) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  if (window.pdfjsLib) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+  }
+</script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+
+<!-- Sistema -->
+<script src="js/config.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/authGuard.js"></script>
+<script src="js/fileTypeDetector.js"></script>
+<script src="js/extractors/csvTxtExtractor.js"></script>
+<script src="js/extractors/xlsxExtractor.js"></script>
+<script src="js/extractors/pdfExtractor.js"></script>
+<script src="js/extractors/visionExtractor.js"></script>
+<script src="js/normalize/genericScanner.js"></script>
+<script src="js/normalize/normalizer.js"></script>
+<script src="js/identity/matcher.js"></script>
+<script src="js/compare/engine.js"></script>
+<script src="js/validate/validator.js"></script>
+<script src="js/report/pdfReport.js"></script>
+<script src="js/ui/render.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

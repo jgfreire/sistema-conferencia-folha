@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel Administrativo — Conferência de Folha</title>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div id="admin-app">
+  <header>
+    <div class="title-block">
+      <h1>Painel Administrativo</h1>
+      <p>Conferência de Folha</p>
+    </div>
+    <div class="actions">
+      <span class="session-user" id="session-user"></span>
+      <button class="btn" id="logout-btn">Sair</button>
+    </div>
+  </header>
+
+  <div class="admin-layout">
+    <nav class="admin-nav">
+      <button class="admin-nav-item active" data-tab="dashboard">Dashboard</button>
+      <button class="admin-nav-item" data-tab="usuarios">Usuários</button>
+      <button class="admin-nav-item" data-tab="configuracoes">Configurações</button>
+      <button class="admin-nav-item" data-tab="ocr">API / IA</button>
+      <button class="admin-nav-item" data-tab="logs">Logs</button>
+      <button class="admin-nav-item" data-tab="seguranca">Segurança</button>
+    </nav>
+
+    <main class="admin-content">
+      <section id="tab-dashboard" class="admin-tab active">
+        <h2>Dashboard</h2>
+        <div id="dashboard-content" class="admin-panel">Carregando…</div>
+      </section>
+
+      <section id="tab-usuarios" class="admin-tab">
+        <h2>Usuários</h2>
+        <div class="admin-panel">
+          <form id="new-user-form" class="inline-form">
+            <input type="text" id="new-username" placeholder="Novo usuário" required>
+            <input type="password" id="new-password" placeholder="Senha (mín. 8 caracteres)" required>
+            <button type="submit" class="btn btn-primary">Criar colaborador</button>
+          </form>
+          <div id="user-form-error" class="alert alert-error hidden"></div>
+          <div id="users-table-area"></div>
+        </div>
+      </section>
+
+      <section id="tab-configuracoes" class="admin-tab">
+        <h2>Configurações</h2>
+        <div id="settings-content" class="admin-panel">Carregando…</div>
+      </section>
+
+      <section id="tab-ocr" class="admin-tab">
+        <h2>API / IA (leitura de fotos e PDFs digitalizados)</h2>
+        <div id="ocr-content" class="admin-panel">Carregando…</div>
+      </section>
+
+      <section id="tab-logs" class="admin-tab">
+        <h2>Logs</h2>
+        <div id="logs-content" class="admin-panel">Carregando…</div>
+      </section>
+
+      <section id="tab-seguranca" class="admin-tab">
+        <h2>Segurança</h2>
+        <div id="seguranca-content" class="admin-panel">Carregando…</div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<script src="js/utils.js"></script>
+<script src="js/authGuard.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

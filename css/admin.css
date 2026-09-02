@@ -1,0 +1,100 @@
+.admin-layout {
+  display: flex;
+  min-height: calc(100vh - 70px);
+}
+
+.admin-nav {
+  width: 200px;
+  flex-shrink: 0;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.admin-nav-item {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 11px 20px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  border-left: 3px solid transparent;
+}
+.admin-nav-item:hover { background: var(--accent-soft); }
+.admin-nav-item.active {
+  border-left-color: var(--accent);
+  background: var(--accent-soft);
+  font-weight: 600;
+}
+
+.admin-content {
+  flex: 1;
+  padding: 28px 32px;
+  max-width: 960px;
+}
+
+.admin-content h2 { margin: 0 0 16px; font-size: 18px; }
+
+.admin-tab { display: none; }
+.admin-tab.active { display: block; }
+
+.admin-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 20px;
+}
+
+.inline-form {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.inline-form input {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+}
+
+.admin-table-wrap { overflow-x: auto; }
+
+table.admin-table {
+  width: 100%;
+  min-width: 480px;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+table.admin-table th, table.admin-table td {
+  border: 1px solid var(--border);
+  padding: 8px 10px;
+  text-align: left;
+}
+table.admin-table th { background: var(--accent-soft); }
+
+.status-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+.status-pill.active { background: #e8f5ec; color: #1a7a3c; }
+.status-pill.blocked { background: #fbeceb; color: #b3261e; }
+
+.row-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.row-actions .btn { padding: 4px 8px; font-size: 12px; }
+
+.kv-list { font-size: 13.5px; }
+.kv-list dt { font-weight: 600; margin-top: 10px; }
+.kv-list dt:first-child { margin-top: 0; }
+.kv-list dd { margin: 2px 0 0; color: var(--text-muted); }
+
+.empty-note { color: var(--text-muted); font-size: 13.5px; }
