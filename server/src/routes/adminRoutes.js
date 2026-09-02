@@ -15,6 +15,7 @@ router.get("/logs", adminInfoController.logs);
 router.get("/users", userController.list);
 router.post("/users", userController.create);
 router.put("/users/:id", userController.update);
+router.post("/users/:id/role", userController.setRole);
 router.post("/users/:id/password", userController.resetPassword);
 router.post("/users/:id/block", userController.block);
 router.post("/users/:id/unblock", userController.unblock);

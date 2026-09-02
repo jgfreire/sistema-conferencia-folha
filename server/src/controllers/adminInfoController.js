@@ -15,13 +15,16 @@ function mask(value) {
 
 function dashboard(req, res) {
   const usuarios = userModel.listAll();
+  const colaboradores = usuarios.filter((u) => u.role === "COLLABORATOR");
+  const adminsAdicionais = usuarios.filter((u) => u.role === "ADMIN");
   const logs = logModel.listRecent(10);
   res.json({
     colaboradores: {
-      total: usuarios.length,
-      ativos: usuarios.filter((u) => u.status === "ACTIVE").length,
-      bloqueados: usuarios.filter((u) => u.status === "BLOCKED").length
+      total: colaboradores.length,
+      ativos: colaboradores.filter((u) => u.status === "ACTIVE").length,
+      bloqueados: colaboradores.filter((u) => u.status === "BLOCKED").length
     },
+    administradoresAdicionais: adminsAdicionais.length,
     ultimasAtividades: logs.length
       ? logs.map((l) => ({ tipo: l.event_type, usuario: l.username, quando: l.created_at }))
       : null,

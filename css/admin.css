@@ -56,7 +56,8 @@
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
-.inline-form input {
+.inline-form input,
+.inline-form select {
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;

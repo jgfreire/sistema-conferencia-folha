@@ -48,6 +48,8 @@
         <dl class="kv-list">
           <dt>Colaboradores</dt>
           <dd>${d.colaboradores.total} total — ${d.colaboradores.ativos} ativos, ${d.colaboradores.bloqueados} bloqueados</dd>
+          <dt>Administradores adicionais</dt>
+          <dd>${d.administradoresAdicionais} (mais o administrador mestre)</dd>
           <dt>Análises realizadas</dt>
           <dd>${d.analisesRealizadas == null ? "Nenhum dado disponível." : d.analisesRealizadas}</dd>
           <dt>Relatórios processados</dt>
@@ -64,15 +66,29 @@
   function userRow(u) {
     const statusClass = u.status === "ACTIVE" ? "active" : "blocked";
     const statusLabel = u.status === "ACTIVE" ? "Ativo" : "Bloqueado";
+    const isSelf = CF.currentUser && String(CF.currentUser.id) === String(u.id);
+    const roleActionBtn = isSelf
+      ? ""
+      : u.role === "ADMIN"
+        ? `<button class="btn" data-action="demote">Rebaixar a colaborador</button>`
+        : `<button class="btn" data-action="promote">Promover a administrador</button>`;
     return `
       <tr data-id="${u.id}">
-        <td>${esc(u.username)}</td>
+        <td>${esc(u.username)}${isSelf ? " (você)" : ""}</td>
+        <td>${u.role === "ADMIN" ? "Administrador" : "Colaborador"}</td>
         <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
         <td>${esc(u.created_at || "")}</td>
         <td class="row-actions">
-          ${u.status === "ACTIVE" ? `<button class="btn" data-action="block">Bloquear</button>` : `<button class="btn" data-action="unblock">Desbloquear</button>`}
+          ${roleActionBtn}
+          ${
+            isSelf
+              ? ""
+              : u.status === "ACTIVE"
+                ? `<button class="btn" data-action="block">Bloquear</button>`
+                : `<button class="btn" data-action="unblock">Desbloquear</button>`
+          }
           <button class="btn" data-action="reset-password">Alterar senha</button>
-          <button class="btn" data-action="delete">Excluir</button>
+          ${isSelf ? "" : `<button class="btn" data-action="delete">Excluir</button>`}
         </td>
       </tr>`;
   }
@@ -83,10 +99,10 @@
       const users = await api("/api/admin/users");
       area.innerHTML = users.length
         ? `<div class="admin-table-wrap"><table class="admin-table">
-            <thead><tr><th>Usuário</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Usuário</th><th>Papel</th><th>Status</th><th>Criado em</th><th>Ações</th></tr></thead>
             <tbody>${users.map(userRow).join("")}</tbody>
           </table></div>`
-        : `<p class="empty-note">Nenhum colaborador cadastrado ainda.</p>`;
+        : `<p class="empty-note">Nenhum usuário cadastrado ainda.</p>`;
 
       area.querySelectorAll("button[data-action]").forEach((btn) => {
         btn.addEventListener("click", () => handleUserAction(btn));
@@ -102,8 +118,16 @@
     try {
       if (action === "block") await api(`/api/admin/users/${id}/block`, { method: "POST" });
       if (action === "unblock") await api(`/api/admin/users/${id}/unblock`, { method: "POST" });
+      if (action === "promote") {
+        if (!confirm("Promover este usuário a administrador? Ele passará a ter acesso total ao painel (usando a mesma chave de administrador).")) return;
+        await api(`/api/admin/users/${id}/role`, { method: "POST", body: JSON.stringify({ role: "ADMIN" }) });
+      }
+      if (action === "demote") {
+        if (!confirm("Rebaixar este administrador a colaborador?")) return;
+        await api(`/api/admin/users/${id}/role`, { method: "POST", body: JSON.stringify({ role: "COLLABORATOR" }) });
+      }
       if (action === "delete") {
-        if (!confirm("Excluir este colaborador? Essa ação não pode ser desfeita.")) return;
+        if (!confirm("Excluir este usuário? Essa ação não pode ser desfeita.")) return;
         await api(`/api/admin/users/${id}`, { method: "DELETE" });
       }
       if (action === "reset-password") {
@@ -125,8 +149,9 @@
       errorEl.classList.add("hidden");
       const username = document.getElementById("new-username").value.trim();
       const password = document.getElementById("new-password").value;
+      const role = document.getElementById("new-role").value;
       try {
-        await api("/api/admin/users", { method: "POST", body: JSON.stringify({ username, password }) });
+        await api("/api/admin/users", { method: "POST", body: JSON.stringify({ username, password, role }) });
         form.reset();
         loadUsers();
       } catch (err) {
@@ -210,8 +235,10 @@
           <dd>Bloqueio após ${s.sessao.limiteTentativasLogin} tentativas incorretas, por ${s.sessao.bloqueioMinutos} minutos.</dd>
           <dt>Senhas</dt>
           <dd>Armazenadas com hash scrypt — nunca em texto puro.</dd>
-          <dt>Administrador</dt>
-          <dd>Conta única, definida por variáveis de ambiente no servidor; não pode ser criada, editada ou promovida pelo painel.</dd>
+          <dt>Administrador mestre</dt>
+          <dd>Definido por variáveis de ambiente no servidor; não pode ser criado, editado ou removido pelo painel.</dd>
+          <dt>Administradores adicionais</dt>
+          <dd>Podem ser criados/promovidos em Usuários por um administrador já autenticado. Login exige usuário+senha do banco e a mesma chave de administrador do .env. Ninguém pode promover, bloquear ou excluir a própria conta.</dd>
         </dl>`;
     } catch (err) {
       el.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;

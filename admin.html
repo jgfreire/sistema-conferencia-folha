@@ -42,7 +42,11 @@
           <form id="new-user-form" class="inline-form">
             <input type="text" id="new-username" placeholder="Novo usuário" required>
             <input type="password" id="new-password" placeholder="Senha (mín. 8 caracteres)" required>
-            <button type="submit" class="btn btn-primary">Criar colaborador</button>
+            <select id="new-role">
+              <option value="COLLABORATOR">Colaborador</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Criar usuário</button>
           </form>
           <div id="user-form-error" class="alert alert-error hidden"></div>
           <div id="users-table-area"></div>

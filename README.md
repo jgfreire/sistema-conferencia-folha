@@ -75,8 +75,20 @@ Pela mesma tela é possível bloquear/desbloquear, trocar senha e excluir colabo
 
 ## Autenticação e controle de acesso
 
-Dois níveis: **ADMIN** (só a conta definida no `.env`, sem cadastro pela tela) e **COLLABORATOR**
-(criados pelo admin, acesso só às funcionalidades operacionais).
+Dois níveis: **ADMIN** e **COLLABORATOR**. Existem dois jeitos de ser ADMIN:
+
+1. **Administrador mestre** — a conta definida no `server/.env` (`ADMIN_USERNAME`/
+   `ADMIN_PASSWORD_HASH`). Não é um registro no banco de dados, então nunca fica bloqueado do
+   sistema mesmo se o banco for perdido ou corrompido. Não pode ser criado, editado ou removido
+   pelo painel — só editando o `.env` diretamente no servidor.
+2. **Administradores adicionais** — usuários do banco de dados (a mesma tabela dos colaboradores)
+   promovidos por um admin já autenticado, em **Usuários** no painel (ou já criados direto como
+   administrador, escolhendo o papel na hora de criar). Fazem login com usuário+senha normais,
+   mas **também precisam da mesma `ADMIN_ACCESS_KEY`** do `.env` — a chave é um segredo do nível
+   "administrador" como um todo, compartilhado por todos os admins, não uma senha individual.
+
+Em nenhum dos dois casos um usuário consegue alterar a própria conta (promover a si mesmo,
+bloquear a si mesmo ou se excluir) — sempre precisa ser outro administrador agindo.
 
 - A role de cada usuário é decidida **inteiramente pelo backend**, na sessão criada no login — nada que o
   navegador envie depois é usado pra isso. `/admin` e as rotas `/api/admin/*` verificam autenticação e
@@ -88,8 +100,8 @@ Dois níveis: **ADMIN** (só a conta definida no `.env`, sem cadastro pela tela)
 - Login: limite de tentativas (`LOGIN_MAX_ATTEMPTS`, padrão 5) com bloqueio temporário
   (`LOGIN_LOCKOUT_MINUTES`, padrão 15 min); mensagem de erro sempre genérica ("Usuário ou senha
   inválidos."), sem indicar qual dado estava errado.
-- `ADMIN_ACCESS_KEY` é uma credencial exclusiva do administrador — diferente da senha e diferente da
-  `ANTHROPIC_API_KEY` — e nunca sai do servidor.
+- `ADMIN_ACCESS_KEY` é uma credencial exclusiva do nível administrador — diferente da senha e diferente
+  da `ANTHROPIC_API_KEY` — e nunca sai do servidor.
 - Painel administrativo (`/admin`): Dashboard, Usuários, Configurações, API/IA, Logs, Segurança. Segredos
   (chave da Anthropic) aparecem sempre mascarados (ex.: `••••••••ABCD`), nunca completos.
 
