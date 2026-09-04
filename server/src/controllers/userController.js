@@ -14,11 +14,14 @@ const { logEvent } = require("../utils/logger");
 
 const VALID_ROLES = new Set(["COLLABORATOR", "ADMIN"]);
 
+// Aceita nomes normais (com espaço e acento, ex.: "João Silva") — letras (inclusive
+// acentuadas), números, espaço e pontuação básica são todos permitidos, mas nenhum é
+// obrigatório além do tamanho mínimo.
 function validUsername(username) {
-  return typeof username === "string" && /^[a-zA-Z0-9._-]{3,40}$/.test(username);
+  return typeof username === "string" && /^[\p{L}\p{N} '._-]{3,60}$/u.test(username.trim());
 }
 function validPassword(password) {
-  return typeof password === "string" && password.length >= 8;
+  return typeof password === "string" && password.length >= 6;
 }
 function isSelf(req, id) {
   return String(req.session.user.id) === String(id);
@@ -31,13 +34,13 @@ function list(req, res) {
 function create(req, res) {
   const { username, password, role } = req.body || {};
   if (!validUsername(username)) {
-    return res.status(400).json({ error: "Nome de usuário inválido (3-40 caracteres, letras/números/._-)." });
+    return res.status(400).json({ error: "Nome de usuário inválido (3-60 caracteres)." });
   }
   if (isAdminUsername(username)) {
     return res.status(400).json({ error: "Este nome de usuário é reservado." });
   }
   if (!validPassword(password)) {
-    return res.status(400).json({ error: "A senha deve ter pelo menos 8 caracteres." });
+    return res.status(400).json({ error: "A senha deve ter pelo menos 6 caracteres." });
   }
   if (role !== undefined && !VALID_ROLES.has(role)) {
     return res.status(400).json({ error: "Papel inválido." });
@@ -106,7 +109,7 @@ function resetPassword(req, res) {
 
   const { password } = req.body || {};
   if (!validPassword(password)) {
-    return res.status(400).json({ error: "A senha deve ter pelo menos 8 caracteres." });
+    return res.status(400).json({ error: "A senha deve ter pelo menos 6 caracteres." });
   }
   userModel.updatePassword(id, hashPassword(password));
   logEvent("SENHA_ALTERADA", { username: req.session.user.username, detail: { id } });

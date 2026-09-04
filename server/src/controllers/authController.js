@@ -11,8 +11,13 @@ const GENERIC_ERROR = "Usuário ou senha inválidos.";
 
 function login(req, res) {
   const { username, password, accessKey } = req.body || {};
-  if (!username || typeof username !== "string" || !password || typeof password !== "string") {
-    return res.status(400).json({ error: GENERIC_ERROR });
+  // Campo vazio não revela nada sobre nenhuma conta específica, então pode ter mensagem
+  // própria — diferente de usuário/senha/chave errados, que sempre usam GENERIC_ERROR.
+  if (!username || typeof username !== "string") {
+    return res.status(400).json({ error: "Preencha o usuário." });
+  }
+  if (!password || typeof password !== "string") {
+    return res.status(400).json({ error: "Preencha a senha." });
   }
 
   if (rateLimiter.isLocked(username)) {

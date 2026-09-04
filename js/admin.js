@@ -131,7 +131,7 @@
         await api(`/api/admin/users/${id}`, { method: "DELETE" });
       }
       if (action === "reset-password") {
-        const nova = prompt("Nova senha (mínimo 8 caracteres):");
+        const nova = prompt("Nova senha (mínimo 6 caracteres):");
         if (!nova) return;
         await api(`/api/admin/users/${id}/password`, { method: "POST", body: JSON.stringify({ password: nova }) });
       }

@@ -9,8 +9,8 @@ if (!plain) {
   console.error('Uso: npm run hash-password -- "minha-senha-aqui"');
   process.exit(1);
 }
-if (plain.length < 8) {
-  console.error("Escolha uma senha com pelo menos 8 caracteres.");
+if (plain.length < 6) {
+  console.error("Escolha uma senha com pelo menos 6 caracteres.");
   process.exit(1);
 }
 
