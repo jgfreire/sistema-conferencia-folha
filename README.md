@@ -35,6 +35,32 @@ você fechar a janela minimizada do terminal (ou reiniciar o computador).
 3. Acesse `http://localhost:3000` no **Chrome** (ou a porta que você definir em `PORT`, no `.env`).
 4. Deixe esse terminal aberto enquanto o sistema estiver em uso — fechar a janela derruba o servidor.
 
+### Opção 3 — PM2 (recomendado para o computador que serve como servidor principal)
+
+Roda em segundo plano (sem terminal aberto), inicia sozinho com o Windows e reinicia
+automaticamente se travar. Uma vez configurado, não precisa repetir esses passos.
+
+```
+npm install -g pm2 pm2-windows-startup
+npx pm2-startup install
+cd server
+pm2 start src/server.js --name conferencia-folha
+pm2 save
+```
+
+Comandos úteis depois:
+```
+pm2 status                        # ver se está rodando
+pm2 logs conferencia-folha        # ver logs em tempo real
+pm2 restart conferencia-folha --update-env   # reiniciar (recarrega o .env se ele mudou)
+pm2 stop conferencia-folha        # parar
+```
+
+**Importante:** `NODE_ENV` no `.env` deve ficar como `development` neste tipo de instalação
+(acesso local/rede via `http://`, sem HTTPS). `NODE_ENV=production` faz o cookie de sessão exigir
+conexão segura — funciona em `http://localhost` (navegadores tratam como especial), mas **quebra o
+login para quem acessar pelo IP da rede** (a sessão não persiste, cai de volta no login).
+
 ## Configuração do administrador
 
 1. Copie `server/.env.example` para `server/.env`.
