@@ -113,9 +113,101 @@ CF.ui = CF.ui || {};
     `;
   }
 
+  // ---- Conferência de 3 meses ----
+  function situacaoClassTres(situacao) {
+    switch (situacao) {
+      case "SEM ALTERAÇÃO":
+        return "sit-neutra";
+      case "VARIAÇÃO NA FOLHA":
+        return "sit-aumento";
+      case "NOVO NA FOLHA":
+        return "sit-novo";
+      default:
+        return "sit-nao-identificado";
+    }
+  }
+
+  function difTres(v) {
+    if (v == null) return "—";
+    return (v > 0 ? "+ " : v < 0 ? "- " : "") + CF.utils.formatMoneyBR(Math.abs(v));
+  }
+
+  function renderTabelaTres(resultados, nomeColuna, labels) {
+    if (!resultados.length) {
+      return `<p class="empty-note">Nenhuma divergência encontrada nesta seção.</p>`;
+    }
+    const rows = resultados
+      .map(
+        (r) => `
+      <tr>
+        <td>${esc(r.empresaNome || "—")}</td>
+        <td>${esc(r.cnpj || "—")}</td>
+        <td>${esc(r.nome || "—")}</td>
+        <td>${esc(r.codigo || "—")}</td>
+        ${r.valores.map((v) => `<td class="num">${v == null ? "—" : CF.utils.formatMoneyBR(v)}</td>`).join("")}
+        <td class="num">${difTres(r.diferenca12)}</td>
+        <td class="num">${difTres(r.diferenca23)}</td>
+        <td><span class="badge ${situacaoClassTres(r.situacao)}">${esc(r.situacao)}</span></td>
+      </tr>`
+      )
+      .join("");
+
+    return `
+      <div class="table-wrap">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th>Empresa</th><th>CNPJ</th><th>${esc(nomeColuna)}</th><th>Código</th>
+              ${labels.map((l) => `<th>${esc(l)}</th>`).join("")}
+              <th>Dif. ${esc(labels[0])} → ${esc(labels[1])}</th><th>Dif. ${esc(labels[1])} → ${esc(labels[2])}</th><th>Situação</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    `;
+  }
+
+  function renderResumoBlocoTres(titulo, bloco, labels) {
+    const r = bloco.resumo;
+    const nomeColuna = titulo === "EMPREGADOS" ? "COLABORADORES" : "Sócio/Administrador";
+    return `
+      <section class="resultado-bloco">
+        <h3>${titulo}</h3>
+        <div class="resumo-chips">
+          <span class="chip-stat">Total analisado: <strong>${r.totalAnalisado}</strong></span>
+          <span class="chip-stat sit-neutra">Sem alteração: <strong>${r.semAlteracao}</strong></span>
+          <span class="chip-stat sit-aumento">Variações: <strong>${r.variacoes}</strong></span>
+          <span class="chip-stat sit-novo">Novos: <strong>${r.novos}</strong></span>
+          <span class="chip-stat sit-nao-identificado">Não identificados no último mês: <strong>${r.naoIdentificados}</strong></span>
+          <span class="chip-stat sit-nao-identificado">Ausentes em mês intermediário: <strong>${r.ausentesIntermediario}</strong></span>
+        </div>
+        ${renderTabelaTres(bloco.divergencias, nomeColuna, labels)}
+      </section>
+    `;
+  }
+
+  function labelsCompetencias(extracoes) {
+    return extracoes.map((ext, i) => (ext.competencia ? ext.competencia.label : `Mês ${i + 1}`));
+  }
+
+  function renderResultadoTres(extracoes, comparacao) {
+    const labels = labelsCompetencias(extracoes);
+    return `
+      <div class="resultado-header">
+        <h2>Resultado da Conferência — 3 meses</h2>
+        <p>${labels.map(esc).join(" → ")}</p>
+      </div>
+      ${renderResumoBlocoTres("EMPREGADOS", comparacao.empregados, labels)}
+      ${renderResumoBlocoTres("CONTRIBUINTES", comparacao.contribuintes, labels)}
+    `;
+  }
+
   CF.ui.render = {
     renderFileCard,
     renderErros,
-    renderResultado
+    renderResultado,
+    renderResultadoTres,
+    labelsCompetencias
   };
 })();

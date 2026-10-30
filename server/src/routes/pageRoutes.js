@@ -25,7 +25,12 @@ router.get(["/", "/index.html"], requireAuthPage, (req, res) => {
   res.sendFile(path.join(PROJECT_ROOT, "index.html"));
 });
 
-router.get(["/admin", "/admin.html"], requireAuthPage, requireAdminPage, (req, res) => {
+router.get(["/tres-meses", "/tres-meses.html"], requireAuthPage, (req, res) => {
+  noStore(res);
+  res.sendFile(path.join(PROJECT_ROOT, "tres-meses.html"));
+});
+
+router.get(["/admin","/admin.html"], requireAuthPage, requireAdminPage, (req, res) => {
   noStore(res);
   res.sendFile(path.join(PROJECT_ROOT, "admin.html"));
 });

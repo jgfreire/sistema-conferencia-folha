@@ -118,5 +118,91 @@ CF.compare = CF.compare || {};
     };
   }
 
-  CF.compare.engine = { comparar, apenasDivergencias };
+  // ---- Conferência de 3 meses (página /tres-meses) ----
+  // Compara M1 → M2 → M3 para a mesma pessoa. Situação decidida pelo padrão de presença
+  // nos três meses; com presença nos três, qualquer diferença de valor é VARIAÇÃO NA FOLHA.
+  function situacaoTres(presenca, valores) {
+    const padrao = presenca.map((p) => (p ? "1" : "0")).join("");
+    switch (padrao) {
+      case "111":
+        return valores[0] === valores[1] && valores[1] === valores[2] ? "SEM ALTERAÇÃO" : "VARIAÇÃO NA FOLHA";
+      case "011":
+      case "001":
+        return "NOVO NA FOLHA";
+      case "110":
+      case "100":
+        return "NÃO IDENTIFICADO NO ÚLTIMO MÊS";
+      case "101":
+        return "AUSENTE NO MÊS INTERMEDIÁRIO";
+      default:
+        return "PRESENTE SÓ NO MÊS INTERMEDIÁRIO";
+    }
+  }
+
+  function compararOrigemTres(registrosPorMes) {
+    const buildKey = CF.identity.matcher.buildRecordKey;
+    const mapas = registrosPorMes.map((registros) => {
+      const m = new Map();
+      registros.forEach((r) => m.set(buildKey(r), r));
+      return m;
+    });
+
+    const keys = new Set(mapas.flatMap((m) => [...m.keys()]));
+    const resultados = [];
+
+    keys.forEach((key) => {
+      const recs = mapas.map((m) => m.get(key));
+      const base = recs.slice().reverse().find(Boolean);
+      const valores = recs.map((r) => (r ? r.valor : null));
+      const presenca = recs.map(Boolean);
+      const dif = (a, b) => (valores[a] == null || valores[b] == null ? null : CF.utils.round2(valores[b] - valores[a]));
+
+      resultados.push({
+        chave: key,
+        empresaNome: base.empresaNome,
+        cnpj: base.cnpj,
+        codigo: base.codigo,
+        nome: base.nome,
+        origem: base.origem,
+        valores,
+        diferenca12: dif(0, 1),
+        diferenca23: dif(1, 2),
+        situacao: situacaoTres(presenca, valores)
+      });
+    });
+
+    resultados.sort((a, b) => (a.empresaNome || "").localeCompare(b.empresaNome || "") || a.nome.localeCompare(b.nome));
+    return resultados;
+  }
+
+  function resumirTres(resultados) {
+    const resumo = {
+      totalAnalisado: resultados.length,
+      semAlteracao: 0,
+      variacoes: 0,
+      novos: 0,
+      naoIdentificados: 0,
+      ausentesIntermediario: 0
+    };
+    resultados.forEach((r) => {
+      if (r.situacao === "SEM ALTERAÇÃO") resumo.semAlteracao++;
+      else if (r.situacao === "VARIAÇÃO NA FOLHA") resumo.variacoes++;
+      else if (r.situacao === "NOVO NA FOLHA") resumo.novos++;
+      else if (r.situacao === "NÃO IDENTIFICADO NO ÚLTIMO MÊS") resumo.naoIdentificados++;
+      else resumo.ausentesIntermediario++;
+    });
+    return resumo;
+  }
+
+  function compararTresMeses(extracoes) {
+    const porMes = (campo) => extracoes.map((ext) => ext.empresas.flatMap((e) => e[campo]));
+    const empregados = compararOrigemTres(porMes("empregados"));
+    const contribuintes = compararOrigemTres(porMes("contribuintes"));
+    return {
+      empregados: { resultados: empregados, divergencias: apenasDivergencias(empregados), resumo: resumirTres(empregados) },
+      contribuintes: { resultados: contribuintes, divergencias: apenasDivergencias(contribuintes), resumo: resumirTres(contribuintes) }
+    };
+  }
+
+  CF.compare.engine = { comparar, apenasDivergencias, compararTresMeses };
 })();

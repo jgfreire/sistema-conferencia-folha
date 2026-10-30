@@ -50,5 +50,27 @@ CF.validate = CF.validate || {};
     };
   }
 
-  CF.validate.validator = { validarParaConferencia };
+  function validarParaConferenciaTres(extracoes) {
+    const erros = [];
+    extracoes.forEach((ext) => erros.push(...ext.erros));
+
+    const labels = extracoes.map((ext) => (ext.competencia ? ext.competencia.label : null));
+    const repetidas = labels.filter((l, i) => l && labels.indexOf(l) !== i);
+    if (repetidas.length) {
+      erros.push(
+        `Mais de um arquivo aparenta ser da mesma competência (${[...new Set(repetidas)].join(", ")}). Envie três meses diferentes.`
+      );
+    }
+
+    if (!repetidas.length && extracoes.every((ext) => ext.competencia)) {
+      const chaves = extracoes.map((ext) => ext.competencia.aaaa + ext.competencia.mm);
+      if (chaves.some((c, i) => i > 0 && c < chaves[i - 1])) {
+        erros.push(`Os arquivos estão fora de ordem (${labels.join(", ")}). Envie do mês mais antigo para o mais recente.`);
+      }
+    }
+
+    return { podeConferir: erros.length === 0, erros };
+  }
+
+  CF.validate.validator = { validarParaConferencia,validarParaConferenciaTres };
 })();
