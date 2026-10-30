@@ -24,7 +24,11 @@ window.CF = window.CF || {};
     const userEl = document.getElementById("session-user");
     if (userEl) userEl.textContent = `${user.username} (${user.role === "ADMIN" ? "Administrador" : "Colaborador"})`;
 
-    const logoutBtn = document.getElementById("logout-btn");
+    // Administrador tem acesso a tudo: as telas de conferência mostram o atalho para o painel.
+    const adminLink = document.getElementById("admin-link");
+    if (adminLink && user.role === "ADMIN") adminLink.classList.remove("hidden");
+
+    const logoutBtn =document.getElementById("logout-btn");
     if (logoutBtn) {
       logoutBtn.addEventListener("click", async () => {
         try {

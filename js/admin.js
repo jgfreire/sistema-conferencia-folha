@@ -31,9 +31,7 @@
     if (tab === "dashboard") loadDashboard();
     if (tab === "usuarios") loadUsers();
     if (tab === "configuracoes") loadSettings();
-    if (tab === "ocr") loadOcr();
     if (tab === "logs") loadLogs();
-    if (tab === "seguranca") loadSeguranca();
   }
 
   // ---------- Dashboard ----------
@@ -181,26 +179,6 @@
     }
   }
 
-  // ---------- API / IA ----------
-  async function loadOcr() {
-    const el = document.getElementById("ocr-content");
-    try {
-      const s = await api("/api/admin/settings");
-      el.innerHTML = `
-        <dl class="kv-list">
-          <dt>Leitura de fotos/PDFs digitalizados</dt>
-          <dd>${s.ocr.configurado ? "Configurada" : "Não configurada"}</dd>
-          <dt>Chave da API da Anthropic</dt>
-          <dd>${s.ocr.configurado ? esc(s.ocr.chaveMascarada) : "—"}</dd>
-          <dt>Modelo</dt>
-          <dd>${esc(s.ocr.modelo)}</dd>
-        </dl>
-        <p class="empty-note" style="margin-top:14px">A chave é configurada via ANTHROPIC_API_KEY no servidor (server/.env) e nunca é enviada ao navegador.</p>`;
-    } catch (err) {
-      el.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-    }
-  }
-
   // ---------- Logs ----------
   async function loadLogs() {
     const el = document.getElementById("logs-content");
@@ -217,29 +195,6 @@
               .join("")}</tbody>
           </table></div>`
         : `<p class="empty-note">Nenhum dado disponível.</p>`;
-    } catch (err) {
-      el.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
-    }
-  }
-
-  // ---------- Segurança ----------
-  async function loadSeguranca() {
-    const el = document.getElementById("seguranca-content");
-    try {
-      const s = await api("/api/admin/settings");
-      el.innerHTML = `
-        <dl class="kv-list">
-          <dt>Sessão</dt>
-          <dd>Cookie HttpOnly, SameSite=Lax, expira após ${s.sessao.duracaoMinutos} minutos de inatividade.</dd>
-          <dt>Proteção de login</dt>
-          <dd>Bloqueio após ${s.sessao.limiteTentativasLogin} tentativas incorretas, por ${s.sessao.bloqueioMinutos} minutos.</dd>
-          <dt>Senhas</dt>
-          <dd>Armazenadas com hash scrypt — nunca em texto puro.</dd>
-          <dt>Administrador mestre</dt>
-          <dd>Definido por variáveis de ambiente no servidor; não pode ser criado, editado ou removido pelo painel.</dd>
-          <dt>Administradores adicionais</dt>
-          <dd>Podem ser criados/promovidos em Usuários por um administrador já autenticado. Login exige usuário+senha do banco e a mesma chave de administrador do .env. Ninguém pode promover, bloquear ou excluir a própria conta.</dd>
-        </dl>`;
     } catch (err) {
       el.innerHTML = `<div class="alert alert-error">${esc(err.message)}</div>`;
     }

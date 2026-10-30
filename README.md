@@ -128,8 +128,9 @@ bloquear a si mesmo ou se excluir) — sempre precisa ser outro administrador ag
   inválidos."), sem indicar qual dado estava errado.
 - `ADMIN_ACCESS_KEY` é uma credencial exclusiva do nível administrador — diferente da senha e diferente
   da `ANTHROPIC_API_KEY` — e nunca sai do servidor.
-- Painel administrativo (`/admin`): Dashboard, Usuários, Configurações, API/IA, Logs, Segurança. Segredos
-  (chave da Anthropic) aparecem sempre mascarados (ex.: `••••••••ABCD`), nunca completos.
+- Painel administrativo (`/admin`): Dashboard, Usuários, Configurações e Logs. O administrador tem acesso
+  a todas as funções do sistema: do painel há atalhos para a Conferência de 2 meses e a de 3 meses, e
+  essas telas têm o atalho de volta para o painel.
 
 ## Como o sistema lê os arquivos
 
