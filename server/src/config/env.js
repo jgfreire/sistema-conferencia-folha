@@ -30,11 +30,6 @@ const ADMIN_USERNAME = required("ADMIN_USERNAME");
 const ADMIN_PASSWORD_HASH = required("ADMIN_PASSWORD_HASH");
 const ADMIN_ACCESS_KEY = required("ADMIN_ACCESS_KEY");
 
-// Only required to actually use the vision/OCR path — a missing key is reported to the
-// caller of that specific route, not a fatal boot error, since the rest of the system
-// (PDF/XLSX/CSV/TXT reading, comparison, PDF report) works without it.
-const ANTHROPIC_API_KEY = process.env.ANTHROPIC_API_KEY || "";
-
 // Se SESSION_SECRET não estiver definido, gera um valor aleatório por processo — funciona,
 // mas invalida sessões a cada reinício do servidor. Recomenda-se definir um valor fixo em
 // produção (server/.env) para não deslogar todo mundo a cada restart/deploy.
@@ -55,7 +50,6 @@ module.exports = {
   ADMIN_USERNAME,
   ADMIN_PASSWORD_HASH,
   ADMIN_ACCESS_KEY,
-  ANTHROPIC_API_KEY,
   SESSION_SECRET,
   SESSION_MAX_AGE_MINUTES,
   LOGIN_MAX_ATTEMPTS,

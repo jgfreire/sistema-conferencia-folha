@@ -74,7 +74,6 @@ login para quem acessar pelo IP da rede** (a sessão não persiste, cai de volta
    - `ADMIN_ACCESS_KEY` — uma segunda chave, só sua, diferente da senha (string longa e aleatória).
      Necessária **além** da senha para entrar como administrador.
    - `SESSION_SECRET` — uma string longa e aleatória qualquer (assina o cookie de sessão).
-   - `ANTHROPIC_API_KEY` — opcional; só necessária para ler fotos/PDFs digitalizados.
 4. **Nunca** commite o `.env` (já está no `.gitignore`) nem compartilhe essas variáveis.
 
 Não existe cadastro de administrador pela tela — é sempre essa única conta, definida pelo `.env`.
@@ -126,8 +125,8 @@ bloquear a si mesmo ou se excluir) — sempre precisa ser outro administrador ag
 - Login: limite de tentativas (`LOGIN_MAX_ATTEMPTS`, padrão 5) com bloqueio temporário
   (`LOGIN_LOCKOUT_MINUTES`, padrão 15 min); mensagem de erro sempre genérica ("Usuário ou senha
   inválidos."), sem indicar qual dado estava errado.
-- `ADMIN_ACCESS_KEY` é uma credencial exclusiva do nível administrador — diferente da senha e diferente
-  da `ANTHROPIC_API_KEY` — e nunca sai do servidor.
+- `ADMIN_ACCESS_KEY` é uma credencial exclusiva do nível administrador — diferente da senha — e nunca
+  sai do servidor.
 - Painel administrativo (`/admin`): Dashboard, Usuários, Configurações e Logs. O administrador tem acesso
   a todas as funções do sistema: do painel há atalhos para a Conferência de 2 meses e a de 3 meses, e
   essas telas têm o atalho de volta para o painel.
@@ -137,10 +136,7 @@ bloquear a si mesmo ou se excluir) — sempre precisa ser outro administrador ag
 - **PDF nativo, XLS/XLSX, CSV, TXT**: leitura 100% local e determinística no navegador, sem custo. O
   sistema localiza os cabeçalhos "EMPREGADOS" e "CONTRIBUINTES" no documento e extrai código, nome e valor
   de cada linha dentro dessas seções.
-- **Fotos e PDFs digitalizados (sem texto selecionável)**: lidos via Claude (API da Anthropic), calibrado
-  para o relatório "Relação Geral dos Líquidos". A chamada à API acontece **no servidor**
-  (`POST /api/vision/extract`, usando `ANTHROPIC_API_KEY` do `.env`) — o navegador nunca tem acesso a essa
-  chave. Sem `ANTHROPIC_API_KEY` configurada, esse tipo de arquivo mostra um erro claro em vez de travar.
+- **Fotos e PDFs digitalizados (sem texto selecionável)**: não são suportados. Use PDF com texto, XLS/XLSX, CSV ou TXT.
 
 ## Como o sistema decide se um aviso é necessário
 
@@ -161,8 +157,6 @@ cabeçalho de empresa repetido) são ignorados e nunca aparecem como "linha não
   descrito pelo escritório; outras variações de formatação podem exigir ajuste.
 - Se uma linha de dado não puder ser interpretada com segurança, o sistema nunca inventa o valor — ele
   não a inclui na comparação.
-- A chamada real à API da Anthropic (leitura de fotos/scans) não foi testada de ponta a ponta nesta sessão
-  por falta de uma chave real — só a validação/conversão de dados foi testada com respostas simuladas.
 
 ## Estrutura
 
@@ -188,17 +182,16 @@ js/validate/validator.js       validações antes da conferência
 js/report/pdfReport.js         geração do PDF final (pdfmake)
 js/ui/render.js                renderização das telas
 
-server/                        backend (Node.js + Express) — autenticação, admin, proxy da API da Anthropic
+server/                        backend (Node.js + Express) — autenticação e admin
   .env.example                 modelo de variáveis de ambiente (copiar para .env)
   scripts/hash-password.js     gera ADMIN_PASSWORD_HASH a partir de uma senha
   src/config/env.js            carrega e valida variáveis de ambiente
   src/db/database.js           SQLite (nativo do Node) — usuários, logs, sessões
   src/auth/                    hashing de senha, identidade do admin, sessão, rate limit, middlewares
-  src/controllers/, routes/    login/logout, CRUD de usuários, dashboard/logs/configurações, proxy de visão
+  src/controllers/, routes/    login/logout, CRUD de usuários, dashboard/logs/configurações
   src/app.js, src/server.js    montagem do Express e ponto de entrada
 ```
 
 ## Custos
 
-A leitura de PDF nativo, Excel, CSV e TXT é 100% local e sem custo. Fotos e PDFs digitalizados usam a API
-da Anthropic (cobrada por token na conta associada à `ANTHROPIC_API_KEY` configurada no servidor).
+A leitura de PDF nativo, Excel, CSV e TXT é 100% local e sem custo.

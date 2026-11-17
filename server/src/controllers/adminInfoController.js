@@ -7,12 +7,6 @@ const userModel = require("../models/userModel");
 const logModel = require("../models/logModel");
 const env = require("../config/env");
 
-function mask(value) {
-  if (!value) return null;
-  const tail = value.slice(-4);
-  return `${"•".repeat(Math.max(value.length - 4, 8))}${tail}`;
-}
-
 function dashboard(req, res) {
   const usuarios = userModel.listAll();
   const colaboradores = usuarios.filter((u) => u.role === "COLLABORATOR");
@@ -40,11 +34,6 @@ function settings(req, res) {
       duracaoMinutos: env.SESSION_MAX_AGE_MINUTES,
       limiteTentativasLogin: env.LOGIN_MAX_ATTEMPTS,
       bloqueioMinutos: env.LOGIN_LOCKOUT_MINUTES
-    },
-    ocr: {
-      configurado: Boolean(env.ANTHROPIC_API_KEY),
-      chaveMascarada: env.ANTHROPIC_API_KEY ? mask(env.ANTHROPIC_API_KEY) : null,
-      modelo: "claude-sonnet-5"
     }
   });
 }

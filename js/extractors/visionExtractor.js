@@ -615,6 +615,11 @@ NUNCA confunda "seção não existente" com "seção existente mas não lida".
    * ========================================================== */
 
   async function callClaudeVision({ documentBase64, mediaType, blockType, prompt }) {
+    // Leitura de fotos/PDFs digitalizados desativada: o sistema não usa API externa.
+    throw new VisionExtractionError(
+      "Leitura de fotos e PDFs digitalizados não está disponível. Envie PDF com texto, planilha (XLS/XLSX), CSV ou TXT."
+    );
+    // eslint-disable-next-line no-unreachable
     const documentBlock =
       blockType === "document"
         ? { type: "document", source: { type: "base64", media_type: mediaType, data: documentBase64 } }

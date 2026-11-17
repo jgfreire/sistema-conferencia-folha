@@ -10,7 +10,6 @@ const { requireAuthApi, requireAdminApi } = require("./auth/middleware");
 
 const authRoutes = require("./routes/authRoutes");
 const adminRoutes = require("./routes/adminRoutes");
-const visionRoutes = require("./routes/visionRoutes");
 const activityRoutes = require("./routes/activityRoutes");
 const pageRoutes = require("./routes/pageRoutes");
 
@@ -47,7 +46,6 @@ app.use("/js", express.static(path.join(PROJECT_ROOT, "js"), { index: false }));
 
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", requireAuthApi, requireAdminApi, adminRoutes);
-app.use("/api/vision", requireAuthApi, visionRoutes);
 app.use("/api/activity", requireAuthApi, activityRoutes);
 
 app.use("/", pageRoutes);
